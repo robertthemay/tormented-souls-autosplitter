@@ -71,7 +71,8 @@ init
 			version = "v0.77.3";
 			break;
 		default:
-			version = "v0.89.0";
+			/* Default to latest version */
+			version = "v0.94.0";
 			break;
 	}
 }
