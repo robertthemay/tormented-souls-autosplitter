@@ -1,3 +1,13 @@
+state("TormentedSouls", "v0.94.0")
+{
+	byte generator :  "UnityPlayer.dll", 0x19C57C8, 0x7E0, 0xE10, 0x1A0, 0x78; // GameplayData->globalLights
+	int keyUsed :  "UnityPlayer.dll", 0x19C57C8, 0x7E0, 0xE10, 0x1A0, 0xB4; // GameplayData->MasterKeysUnlocked
+	byte lamp :  "UnityPlayer.dll", 0x19C57C8, 0x7E0, 0xE10, 0x1A0, 0x48, 0x14; // GameplayData->playerSaveData->acquiredLantern
+	string255 lastDoor : "UnityPlayer.dll", 0x19C57C8, 0x7E0, 0xE10, 0x1A0, 0x50, 0x14; // GameplayData->lastDoor
+	int loadState : "UnityPlayer.dll", 0x19CBF20, 0x0, 0x10, 0x28, 0x18, 0x48, 0x68; // GameplayEntranceManager->managerReady
+	string255 room :  "UnityPlayer.dll", 0x1A34260, 0x48, 0x40; // ??
+}
+
 state("TormentedSouls", "v0.89.0")
 {
 	byte generator :  "mono-2.0-bdwgc.dll", 0x49AC78, 0x340, 0x0, 0x3C0, 0x40, 0x10, 0xA0;
@@ -18,12 +28,23 @@ state("TormentedSouls", "v0.89.0")
 // 	string255 room :  "UnityPlayer.dll", 0x1A058E0, 0x48, 0x40;
 // }
 
+// state("TormentedSouls", "v0.77.3")
+// {
+// 	byte generator :  "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0xA0;
+// 	int keyUsed :  "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0xB8;
+// 	byte lamp :  "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0x40, 0x14;
+// 	string255 lastDoor : "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0x48, 0x14;
+// 	int loadState : "mono-2.0-bdwgc.dll", 0x4A7478, 0x210, 0xE38;
+// 	string255 room :  "UnityPlayer.dll", 0x1A058E0, 0x48, 0x40;
+// }
+
+/* Stability update */
 state("TormentedSouls", "v0.77.3")
 {
-	byte generator :  "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0xA0;
-	int keyUsed :  "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0xB8;
-	byte lamp :  "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0x40, 0x14;
-	string255 lastDoor : "mono-2.0-bdwgc.dll", 0x49A358, 0xF8, 0xA0, 0x1D0, 0x1E8, 0x0, 0x10, 0x48, 0x14;
+	byte generator :  "mono-2.0-bdwgc.dll", 0x495A90, 0x4D58, 0x240, 0xA0;
+	int keyUsed :  "mono-2.0-bdwgc.dll", 0x495A90, 0x4D58, 0x240, 0xB8;
+	byte lamp :  "mono-2.0-bdwgc.dll", 0x495A90, 0x4D58, 0x240, 0x40, 0x14;
+	string255 lastDoor : "mono-2.0-bdwgc.dll", 0x495A90, 0x4D58, 0x240, 0x48, 0x14;
 	int loadState : "mono-2.0-bdwgc.dll", 0x4A7478, 0x210, 0xE38;
 	string255 room :  "UnityPlayer.dll", 0x1A058E0, 0x48, 0x40;
 }
@@ -32,11 +53,25 @@ init
 {
 	switch(modules.First().FileVersionInfo.ProductVersion.ToString()) {
 		case "2020.3.36.7469419":
-			version = "v0.89.0";
+			/* 
+				Note: There's probably a better way to do this, but it will do...
+				v0.89.0 & v0.94.0 have the same ProductVerion.
+				Check UnityPlayer.dll module size to differentiate between the two.
+				UnityPlayer.dll size is 29265920 bytes in v0.89.0 and 29253632 bytes in v0.94.0
+			*/
+			var unityPlayer = modules.FirstOrDefault(m => m.ModuleName.Equals("UnityPlayer.dll"));
+    		int unitySize = unityPlayer != null ? unityPlayer.ModuleMemorySize : 0;
+			if (unitySize == 29253632){
+				version = "v0.94.0";
+			} else {
+				version = "v0.89.0";
+			}
 			break;
-
 		case "2020.3.16.302446":
 			version = "v0.77.3";
+			break;
+		default:
+			version = "v0.89.0";
 			break;
 	}
 }
